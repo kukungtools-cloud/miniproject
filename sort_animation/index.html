@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Aplikasi web interaktif visualisasi algoritma sorting (Bubble Sort, Selection Sort, Insertion Sort, Quick Sort) dengan animasi transisi langkah demi langkah.">
+  <title>Sorting Algorithm Visualizer</title>
+  
+  <!-- Google Fonts: Outfit & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-background">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- Top Compact Header & Control Dock -->
+    <header class="app-topbar glass-card">
+      <div class="brand-group">
+        <div class="brand-logo-icon">
+          <span class="pulse-dot"></span>
+        </div>
+        <div class="brand-text">
+          <h1 class="brand-title">Sorting Visualizer</h1>
+        </div>
+      </div>
+
+      <!-- Compact Controls Group -->
+      <div class="topbar-controls">
+        <!-- Algorithm Selector -->
+        <div class="control-item">
+          <label for="algorithm-select" class="control-label">Algoritma</label>
+          <div class="select-wrapper">
+            <select id="algorithm-select" class="custom-select">
+              <option value="bubble" selected>Bubble Sort</option>
+              <option value="selection">Selection Sort</option>
+              <option value="insertion">Insertion Sort</option>
+              <option value="quick">Quick Sort</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Array Size Slider -->
+        <div class="control-item control-slider-item">
+          <div class="slider-label-wrap">
+            <label for="size-slider" class="control-label">Batang</label>
+            <span id="size-value" class="badge-value">10</span>
+          </div>
+          <input type="range" id="size-slider" class="custom-range" min="4" max="10" value="10" step="1">
+        </div>
+
+        <!-- Speed Slider -->
+        <div class="control-item control-slider-item">
+          <div class="slider-label-wrap">
+            <label for="speed-slider" class="control-label">Kecepatan</label>
+            <span id="speed-value" class="badge-value">Normal</span>
+          </div>
+          <input type="range" id="speed-slider" class="custom-range" min="1" max="100" value="50" step="1">
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="topbar-actions">
+          <button id="btn-generate" class="btn btn-secondary" title="Acak ulang array angka">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
+            <span>Acak</span>
+          </button>
+          
+          <button id="btn-start" class="btn btn-primary" title="Mulai visualisasi pengurutan">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            <span>Mulai</span>
+          </button>
+
+          <button id="btn-reset" class="btn btn-danger" title="Hentikan dan reset posisi" disabled>
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="6" y="6" width="12" height="12" rx="2"/>
+            </svg>
+            <span>Reset</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace: Split Left (Animation & Info) & Right (Metrics & Code) -->
+    <main class="workspace-split">
+      <!-- LEFT COLUMN: Info & Animation Visualizer -->
+      <section class="left-stage-column">
+        <!-- Algorithm Info & Complexity (Pindah ke atas chart) -->
+        <div class="info-card glass-card">
+          <div class="info-header">
+            <h2 id="algo-title" class="algo-name">Bubble Sort</h2>
+            <div class="complexity-chips">
+              <span class="chip chip-time" id="chip-time">Waktu: O(n²)</span>
+              <span class="chip chip-space" id="chip-space">Ruang: O(1)</span>
+            </div>
+          </div>
+          <p id="algo-description" class="algo-desc">
+            Membandingkan pasangan elemen yang bersebelahan secara berulang, menukarnya jika urutannya salah sehingga nilai terbesar bergerak naik ke akhir array.
+          </p>
+        </div>
+
+        <!-- Stage Container -->
+        <div class="visualizer-stage glass-card">
+          <div class="stage-pedestal">
+            <!-- Overhead Crane Gantry Rig for Lift & Shift Animation -->
+            <div class="crane-rig">
+              <div class="crane-rail"></div>
+              <div class="crane-trolley" id="crane-trolley">
+                <div class="trolley-light"></div>
+                <div class="trolley-cable"></div>
+              </div>
+            </div>
+
+            <!-- Dedicated Hoisted Floating Bar for Insertion Sort Lift & Shift -->
+            <div id="crane-floating-bar" class="array-bar state-swapping bar-hoisted" style="display: none; position: absolute;">
+              <span class="bar-label"></span>
+            </div>
+
+            <div id="array-container" class="array-container">
+              <!-- Dynamic bars will be rendered here by script.js -->
+            </div>
+          </div>
+
+          <!-- Legend Bar -->
+          <div class="legend-bar">
+            <div class="legend-item">
+              <span class="legend-dot dot-default"></span>
+              <span>Normal</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot dot-comparing"></span>
+              <span>Membandingkan</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot dot-swapping"></span>
+              <span>Menukar</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot dot-pivot"></span>
+              <span>Pivot/Min</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot dot-sorted"></span>
+              <span>Selesai</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: Metrics & Code Logic -->
+      <aside class="right-code-column">
+        <!-- Compact Live Metrics -->
+        <div class="metrics-card glass-card">
+          <div class="metric-item">
+            <span class="metric-title">Perbandingan</span>
+            <span id="metric-comparisons" class="metric-number">0</span>
+          </div>
+          <div class="metric-divider"></div>
+          <div class="metric-item">
+            <span class="metric-title">Pertukaran</span>
+            <span id="metric-swaps" class="metric-number">0</span>
+          </div>
+          <div class="metric-divider"></div>
+          <div class="metric-item">
+            <span class="metric-title">Waktu</span>
+            <span id="metric-time" class="metric-number">00.00s</span>
+          </div>
+        </div>
+
+        <!-- Live Status Banner (Diantara source code dan kotak diatasnya) -->
+        <div class="status-banner glass-card" id="status-box">
+          <span class="status-indicator"></span>
+          <span id="status-text" class="status-text">Siap memulai pengurutan. Klik "Mulai" untuk menjalankan animasi.</span>
+        </div>
+
+        <!-- Educational Code Step Tracker -->
+        <div class="code-tracker-section glass-card theme-cyber" id="code-tracker-box">
+          <div class="code-header">
+            <div class="code-header-left">
+              <div class="window-controls">
+                <span class="win-btn win-close"></span>
+                <span class="win-btn win-min"></span>
+                <span class="win-btn win-max"></span>
+              </div>
+              <span class="code-title" id="code-filename">bubble_sort.py</span>
+            </div>
+
+            <!-- Theme Color Selector in the Middle -->
+            <div class="code-theme-control">
+              <span class="theme-dot" id="theme-preview-dot"></span>
+              <label for="code-theme-select" class="theme-label">Tema:</label>
+              <div class="theme-select-wrapper">
+                <select id="code-theme-select" class="theme-select" title="Pilih tema warna kode editor">
+                  <option value="cyber" selected>Cyber Blue</option>
+                  <option value="dracula">Dracula</option>
+                  <option value="monokai">Monokai</option>
+                  <option value="onedark">One Dark</option>
+                  <option value="nord">Nord Frost</option>
+                  <option value="matrix">Matrix Green</option>
+                </select>
+              </div>
+            </div>
+
+            <span class="code-lang-tag">Eksekusi Aktif</span>
+          </div>
+          <div class="code-body">
+            <pre><code id="code-display" class="code-content"><!-- Dynamic code lines with line highlights will appear here --></code></pre>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
